@@ -1,4 +1,4 @@
-const fs=require('fs'),path=require('path');
-fs.rmSync('dist',{recursive:true,force:true});fs.mkdirSync('dist',{recursive:true});
-for(const f of ['index.html','styles.css','app.js']) fs.copyFileSync(f,path.join('dist',f));
-console.log('AI PRO CAR static build complete');
+const fs=require('fs');
+if(!fs.existsSync('public/index.html')){throw new Error('Missing public/index.html');}
+if(!fs.existsSync('public/app.js')){throw new Error('Missing public/app.js');}
+console.log('AI PRO CAR Pi Browser build ready');
