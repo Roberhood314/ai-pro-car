@@ -1,4 +1,3 @@
-window.__PI_READY__=!!window.Pi;
 window.addEventListener('error',e=>{const x=document.getElementById('staticBoot');if(x){x.textContent='AI PRO CAR · Runtime error: '+e.message;x.style.background='#4a1515'}});
 (()=>{'use strict';const $=id=>document.getElementById(id);
 const store={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
@@ -38,3 +37,23 @@ function render(){renderG();renderSys();renderDtc();renderPlan();renderEcu();ren
 setInterval(()=>{tel.rpm=Math.round(735+Math.sin(Date.now()/1000)*18);tel.coolant=Math.round(91+Math.sin(Date.now()/3000)*2);tel.stft=(18.2+Math.sin(Date.now()/2000)*1.8).toFixed(1);renderG();ctx()},1000);
 render();const sb=$('staticBoot');if(sb){sb.textContent='AI PRO CAR · READY';setTimeout(()=>sb.style.display='none',500)}
 })()
+function initPiNonBlocking(){
+  const conn=document.getElementById('conn');
+  let settled=false;
+  const finish=(msg)=>{if(settled)return;settled=true;if(conn)conn.textContent=msg;};
+  const timer=setTimeout(()=>finish('APP READY · PI LOGIN SKIPPED IN PREVIEW'),3500);
+  try{
+    const s=document.createElement('script');
+    s.src='https://sdk.minepi.com/pi-sdk.js';
+    s.async=true;
+    s.onload=()=>{
+      try{
+        if(window.Pi){window.Pi.init({version:'2.0',sandbox:false});clearTimeout(timer);finish('PI SDK READY · SAFE READ');}
+        else finish('APP READY · PI SDK UNAVAILABLE');
+      }catch(e){clearTimeout(timer);finish('APP READY · PI INIT FALLBACK');}
+    };
+    s.onerror=()=>{clearTimeout(timer);finish('APP READY · PI SDK FALLBACK');};
+    document.head.appendChild(s);
+  }catch(e){clearTimeout(timer);finish('APP READY · PI FALLBACK');}
+}
+setTimeout(initPiNonBlocking,0);
