@@ -1,11 +1,9 @@
 FROM node:20-bookworm-slim
 RUN corepack enable
 WORKDIR /app
-COPY source-parts ./source-parts
-RUN cat source-parts/part-*.b64 | tr -d '\n' | base64 -d > /tmp/aiprocar-source.tar.gz \
- && tar -xzf /tmp/aiprocar-source.tar.gz -C /app \
- && rm -rf /app/source-parts /tmp/aiprocar-source.tar.gz
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
+COPY . .
 RUN pnpm build
 ENV NODE_ENV=production
 EXPOSE 3000
